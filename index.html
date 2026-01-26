@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Prasad Suryavanshi | Portfolio</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;700;900&family=Courier+Prime&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <style>
         /* --- CONFIGURATION --- */
@@ -17,15 +23,17 @@
             --bg-body: #f4f4f2; 
             --bg-paper: #ffffff;
             --ink-color: #1a1a1a;
-            --accent-bg: #f8f8f8;
+            --accent-bg: #f0f4f8; 
             --border-color: #222222;
+            --primary-color: #0056b3; 
             
             /* Fonts */
             --font-head: 'Playfair Display', serif;
-            --font-body: 'Lora', serif;
+            --font-jp: 'Shippori Mincho', serif;
+            --font-body: 'Lora', 'Shippori Mincho', serif;
             --font-mono: 'Courier Prime', monospace;
             
-            /* Spacing - Increased for breathability */
+            /* Spacing */
             --spacing-sm: 20px;
             --spacing-md: 40px;
             --spacing-lg: 80px;
@@ -36,8 +44,9 @@
             --bg-body: #1e1e1e;
             --bg-paper: #2d2d2d; 
             --ink-color: #e6e6e6;
-            --accent-bg: #383838;
+            --accent-bg: #333333;
             --border-color: #666666;
+            --primary-color: #4cc9f0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,10 +57,18 @@
             font-family: var(--font-body);
             line-height: 1.8; 
             font-size: 18px; 
-            transition: 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.lang-jp {
+            font-family: var(--font-jp);
+            letter-spacing: 0.02em; 
         }
 
         a { text-decoration: none; color: inherit; transition: 0.2s; }
+        a:hover { color: var(--primary-color); }
         
         /* --- MAIN CONTAINER --- */
         .paper-container {
@@ -62,13 +79,13 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.06);
             min-height: 100vh;
             position: relative;
-            transition: 0.3s ease;
+            transition: background-color 0.3s ease;
         }
 
         /* --- HEADER --- */
         header {
             text-align: center;
-            border-bottom: 3px double var(--border-color);
+            border-bottom: 3px double var(--border-color); /* RESTORED STRAIGHT LINE */
             padding-bottom: var(--spacing-md);
             margin-bottom: var(--spacing-lg);
         }
@@ -90,10 +107,35 @@
         .meta-group {
             display: flex;
             align-items: center;
-            gap: 25px;
+            gap: 15px;
         }
 
-        .theme-btn {
+        /* --- FALLING CLOCK STYLES --- */
+        .clock-container {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            height: 1.5em;
+            overflow: hidden; /* Important for falling effect */
+            position: relative;
+        }
+
+        .clock-char {
+            display: inline-block;
+            position: relative;
+            width: 0.6em;
+            text-align: center;
+        }
+        
+        .clock-colon, .clock-ampm {
+            width: auto;
+            margin: 0 2px;
+        }
+
+        /* Buttons */
+        .icon-btn {
             background: transparent;
             border: 1px solid transparent;
             color: var(--ink-color);
@@ -108,42 +150,81 @@
             gap: 8px;
         }
 
-        .theme-btn:hover {
+        .icon-btn:hover {
             background: var(--accent-bg);
             border: 1px solid var(--border-color);
             border-radius: 4px;
         }
 
+        /* --- FIXED NAME STYLING (Stacked & No Wrap) --- */
         h1.masthead {
             font-family: var(--font-head);
-            font-size: clamp(3rem, 7vw, 5.5rem);
             font-weight: 900;
-            line-height: 1.1;
             text-transform: uppercase;
-            letter-spacing: -1px;
             margin: 30px 0;
-            min-height: 1.1em; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 0.9; 
         }
 
-        /* Subheading Animation Styling */
-        .role-wrapper {
+        .name-part {
+            display: block; 
+            /* Clamp ensures it fits mobile (8vw) and doesn't get too huge on desktop (6rem) */
+            font-size: clamp(2.5rem, 10vw, 6rem); 
+            white-space: nowrap; /* PREVENTS "HI" BREAKING OFF */
+            position: relative; 
+            /* No initial opacity here, we let anime.js handle it */
+        }
+
+        /* English Spacing */
+        body:not(.lang-jp) .name-part {
+            letter-spacing: -2px;
+        }
+
+        /* Japanese Spacing */
+        body.lang-jp h1.masthead {
+            font-family: var(--font-jp);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        body.lang-jp .name-part {
+            font-size: clamp(2rem, 8vw, 5rem);
+            margin-bottom: 5px;
+            letter-spacing: 0.05em;
+        }
+
+        /* Anime.js Letter Target */
+        .name-char {
+            display: inline-block;
+            transform-origin: center center;
+        }
+
+        /* --- SUBHEADING --- */
+        .role-container {
             font-family: var(--font-mono);
             font-size: 1.15rem; 
             letter-spacing: 1px;
-            opacity: 0.9;
-            min-height: 1.5em; 
+            color: var(--primary-color);
+            min-height: 2em; 
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden; 
         }
 
-        .cursor {
+        .role-text {
             display: inline-block;
-            width: 2px;
-            background-color: var(--ink-color);
-            animation: blink 1s infinite;
+            position: relative;
         }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .role-text .letter {
+            display: inline-block;
+            line-height: 1em;
+            transform-origin: 50% 100%;
+        }
 
-        /* --- GRID LAYOUT --- */
+        /* --- LAYOUT GRID --- */
         .main-grid {
             display: grid;
             grid-template-columns: 1.8fr 1fr;
@@ -153,7 +234,6 @@
             padding-bottom: var(--spacing-lg);
         }
 
-        /* --- LEFT COLUMN (STORY) --- */
         .headline {
             font-family: var(--font-head);
             font-size: 2.4rem;
@@ -161,6 +241,8 @@
             margin-bottom: 30px;
             font-weight: 700;
         }
+        
+        body.lang-jp .headline { font-family: var(--font-jp); line-height: 1.6; }
 
         .lead-text { font-size: 1.15rem; text-align: justify; }
         .lead-text p { margin-bottom: 25px; }
@@ -171,13 +253,12 @@
             font-family: var(--font-mono);
             font-size: 1rem; 
             margin: 40px 0;
-            border-left: 5px solid var(--ink-color);
+            border-left: 5px solid var(--primary-color);
             transition: 0.3s;
             line-height: 1.8;
         }
         .highlight-box:hover { border-radius: 8px; }
 
-        /* --- RIGHT COLUMN (SIDEBAR) --- */
         .sidebar {
             display: flex;
             flex-direction: column;
@@ -195,24 +276,42 @@
             font-weight: bold;
             padding-bottom: 5px;
         }
+        
+        body.lang-jp .sidebar h3 { font-family: var(--font-jp); }
 
-        /* Skills List */
-        .skill-list li {
-            list-style: none;
-            border-bottom: 1px dotted var(--border-color);
-            padding: 12px 8px; 
+        /* Tech Specs */
+        .tech-stack {
             display: flex;
-            justify-content: space-between;
-            font-size: 1rem; 
-            transition: 0.2s;
-        }
-        .skill-list li:hover {
-            background: var(--accent-bg);
-            border-radius: 6px;
-            border-bottom-color: transparent;
+            flex-direction: column;
+            gap: 15px;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
         }
 
-        /* Social Icons - Centered */
+        .tech-item {
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid var(--border-color);
+            padding-left: 15px;
+            transition: 0.3s;
+        }
+
+        .tech-item:hover {
+            border-left-color: var(--primary-color);
+            background: linear-gradient(90deg, var(--accent-bg) 0%, transparent 100%);
+        }
+
+        .tech-cat {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            margin-bottom: 4px;
+        }
+
+        .tech-val { color: var(--ink-color); line-height: 1.4; }
+
+        /* Social Icons */
         .social-links { 
             display: flex; 
             justify-content: center; 
@@ -220,7 +319,10 @@
             font-size: 1.6rem; 
             padding: 10px 0;
         }
-        .social-links a:hover { transform: translateY(-3px); opacity: 0.7; }
+        .social-links a:hover { 
+            transform: translateY(-3px); 
+            color: var(--primary-color);
+        }
 
         /* Form */
         .inquiry-form { display: flex; flex-direction: column; gap: 20px; }
@@ -234,7 +336,10 @@
             transition: 0.3s;
         }
         .form-input:focus, .form-input:hover {
-            outline: none; border-radius: 8px; background: var(--accent-bg);
+            outline: none; 
+            border-radius: 8px; 
+            background: var(--accent-bg);
+            border-color: var(--primary-color);
         }
         .form-btn {
             background: var(--ink-color); color: var(--bg-paper);
@@ -244,20 +349,39 @@
             font-size: 0.9rem; letter-spacing: 1px;
         }
         .form-btn:hover {
-            background: transparent; color: var(--ink-color); border-radius: 8px;
+            background: var(--primary-color); 
+            color: #fff;
+            border-color: var(--primary-color);
+            border-radius: 8px;
         }
 
-        /* --- EXPERIENCE TIMELINE --- */
+        /* --- SECTION HEADERS (Classic) --- */
         .section-header {
-            text-align: center; margin-bottom: 60px;
-            font-family: var(--font-head); font-style: italic; font-size: 2rem;
-            border-bottom: 1px solid var(--border-color); line-height: 0.1em;
+            text-align: center; 
+            margin-bottom: 60px;
+            font-family: var(--font-head); 
+            font-style: italic; 
+            font-size: 2rem;
+            line-height: 1.5; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px; 
         }
-        .section-header span { 
-            background: var(--bg-paper); padding: 0 30px;
-            transition: 0.3s;
+        
+        body.lang-jp .section-header { font-family: var(--font-jp); font-style: normal; }
+        
+        .section-header::before,
+        .section-header::after {
+            content: "";
+            flex: 1; 
+            border-bottom: 1px solid var(--border-color);
+            opacity: 0.5;
         }
+        
+        .section-header span { position: relative; z-index: 2; }
 
+        /* --- TIMELINE --- */
         .timeline-wrapper {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -271,7 +395,10 @@
             margin-bottom: 35px;
             text-decoration: underline;
             text-underline-offset: 8px;
+            text-decoration-color: var(--primary-color);
         }
+        
+        body.lang-jp .timeline-col h3 { font-family: var(--font-jp); }
 
         .timeline-item {
             margin-bottom: 45px; 
@@ -282,7 +409,7 @@
         }
 
         .timeline-item:hover {
-            border-left: 5px solid var(--ink-color);
+            border-left: 5px solid var(--primary-color);
             padding-left: 30px;
         }
 
@@ -302,6 +429,8 @@
             font-weight: bold;
             margin-bottom: 5px;
         }
+        
+        body.lang-jp .timeline-title { font-family: var(--font-jp); }
 
         .timeline-org {
             font-family: var(--font-mono);
@@ -309,6 +438,7 @@
             font-weight: bold;
             margin-bottom: 15px;
             display: block;
+            color: var(--primary-color);
         }
 
         .timeline-desc {
@@ -327,26 +457,38 @@
             transition: 0.3s; display: flex; flex-direction: column;
         }
         .cert-item:hover {
-            border-radius: 12px; background: var(--accent-bg);
+            border-radius: 12px; 
+            background: var(--accent-bg);
+            border-color: var(--primary-color);
         }
         .cert-title { font-weight: bold; font-family: var(--font-head); font-size: 1.1rem; }
         .cert-issuer { font-size: 0.9rem; opacity: 0.8; font-family: var(--font-mono); margin-top: 8px;}
 
-        /* --- FOOTER --- */
         footer {
             margin-top: 80px; text-align: center;
             font-size: 0.9rem; opacity: 0.7; font-family: var(--font-mono);
         }
 
         /* --- RESPONSIVE --- */
-        @media (max-width: 900px) {
-            .paper-container { width: 95%; margin: 20px auto; padding: 30px; }
-            .main-grid { grid-template-columns: 1fr; gap: 60px; }
-            .timeline-wrapper { grid-template-columns: 1fr; gap: 50px; }
-            .sidebar { padding-left: 0; border-left: none; border-top: 1px solid var(--border-color); padding-top: 50px; }
-            .meta-line { flex-direction: column; gap: 15px; align-items: center; }
+        @media (max-width: 1024px) {
+            .paper-container { width: 95%; margin: 40px auto; padding: 40px; }
+            .main-grid { grid-template-columns: 1fr; gap: 50px; }
+            .sidebar { border-left: none; border-top: 1px solid var(--border-color); padding-left: 0; padding-top: 50px; }
+        }
+
+        @media (max-width: 768px) {
+            .paper-container { width: 100%; margin: 0; padding: 25px; box-shadow: none; }
+            body { font-size: 16px; }
+            .meta-line { flex-direction: column; gap: 15px; align-items: center; text-align: center; }
             .meta-group { justify-content: center; }
-            h1.masthead { font-size: 3.5rem; word-break: break-word; }
+            .headline { font-size: 2rem; }
+            .role-container { font-size: 1rem; }
+            .timeline-wrapper { grid-template-columns: 1fr; gap: 50px; }
+            .cert-list { grid-template-columns: 1fr; }
+            .section-header { font-size: 1.6rem; margin-bottom: 40px; }
+            
+            /* Ensures SURYAVANSHI fits on mobile */
+            .name-part { font-size: 12vw; } 
         }
     </style>
 </head>
@@ -357,41 +499,52 @@
         <header>
             <div class="meta-line">
                 <span id="current-date"></span>
-                <span>Open to Opportunities</span>
+                <span data-en="Open to Opportunities" data-jp="求職中 / 案件募集中">Open to Opportunities</span>
                 
                 <div class="meta-group">
-                    <span id="live-clock" style="font-weight: bold;">00:00:00</span>
+                    <div id="anime-clock" class="clock-container"></div>
                     
-                    <button id="theme-toggle" class="theme-btn" title="Toggle Dark/Light Mode">
+                    <button id="theme-toggle" class="icon-btn" title="Toggle Dark/Light Mode">
                         <i class="fas fa-adjust"></i>
+                    </button>
+
+                    <button id="lang-toggle" class="icon-btn" title="English / Japanese">
+                        JP
                     </button>
                 </div>
             </div>
             
-            <h1 class="masthead" data-value="PRASAD SURYAVANSHI">PRASAD SURYAVANSHI</h1>
+            <h1 class="masthead">
+                <span class="name-part" data-en="PRASAD" data-jp="プラサド">PRASAD</span>
+                <span class="name-part" data-en="SURYAVANSHI" data-jp="スリヤヴァンシ">SURYAVANSHI</span>
+            </h1>
             
-            <div class="role-wrapper">
-                <span id="role-text"></span><span class="cursor"></span>
+            <div class="role-container">
+                <span class="role-text">Aspiring Cybersecurity Analyst</span>
             </div>
         </header>
 
         <div class="main-grid">
             
             <article>
-                <h2 class="headline">Student, Explorer, and Aspiring Developer</h2>
+                <h2 class="headline" data-en="Student, Explorer, and Aspiring Developer" data-jp="学生、冒険家、そして開発者志望">Student, Explorer, and Aspiring Developer</h2>
                 
                 <div class="lead-text">
-                    <p>
+                    <p data-en="I am currently navigating my undergraduate studies in Computer Science (B.Tech) with a specialized focus on Cybersecurity. While my coursework provides the foundation, my real passion lies in the active exploration of technology. I am not claiming to be an expert yet; I am a student eager to understand how things work." 
+                       data-jp="現在、大学でコンピュータサイエンス（B.Tech）を専攻し、特にサイバーセキュリティに重点を置いて学んでいます。授業は基礎を提供してくれますが、私の本当の情熱は技術の積極的な探求にあります。まだ専門家とは言えませんが、仕組みを理解したいという強い意欲を持つ学生です。">
                         I am currently navigating my undergraduate studies in <strong>Computer Science (B.Tech)</strong> with a specialized focus on Cybersecurity. While my coursework provides the foundation, my real passion lies in the active exploration of technology. I am not claiming to be an expert yet; I am a student eager to understand how things work.
                     </p>
-                    <p>
+                    <p data-en="My days are balanced between university requirements and self-driven curiosity. I am diving into optimal programming practices, brainstorming student-level security solutions, and documenting my experiments on GitHub. It's less about specialization right now and more about trying new things and building a versatile skillset."
+                       data-jp="大学の課題と、知的好奇心に基づいた自己学習のバランスを取りながら日々を過ごしています。最適なプログラミング手法を探求し、学生レベルのセキュリティソリューションを考案し、GitHubで実験記録を公開しています。今は専門化することよりも、新しいことに挑戦し、多才なスキルセットを構築することに重きを置いています。">
                         My days are balanced between university requirements and self-driven curiosity. I am diving into <strong>optimal programming practices</strong>, brainstorming student-level security solutions, and documenting my experiments on <strong>GitHub</strong>. It's less about specialization right now and more about trying new things and building a versatile skillset.
                     </p>
-                    <p>
-                        A small part of my current journey is <strong>learning Japanese</strong>. I am fascinated by the culture and discipline, and I am working hard to reach a level of proficiency that will allow me to work and collaborate internationally.
+                    <p data-en="A major part of my current journey is learning Japanese. I am fascinated by the culture and discipline, and I am working hard to reach a level of proficiency that will allow me to work and collaborate internationally."
+                       data-jp="現在の私の旅の重要な部分は、日本語の学習です。日本の文化と規律に魅了されており、国際的に働き、協力できるレベルの語学力に到達するために努力しています。">
+                        A major part of my current journey is <strong>learning Japanese</strong>. I am fascinated by the culture and discipline, and I am working hard to reach a level of proficiency that will allow me to work and collaborate internationally.
                     </p>
                     
-                    <div class="highlight-box">
+                    <div class="highlight-box" data-en="MY GOAL: I want to start my career in Japan and contribute to both the Japanese and Indian tech ecosystems in my own unique way." 
+                         data-jp="目標： 日本でキャリアをスタートさせ、独自の視点で日本とインド両国の技術エコシステムに貢献したいと考えています。">
                         <strong>MY GOAL:</strong><br><br>
                         "I want to start my career in Japan and contribute to both the Japanese and Indian tech ecosystems in my own unique way."
                     </div>
@@ -399,21 +552,30 @@
             </article>
 
             <aside class="sidebar">
-                
                 <div>
-                    <h3>Core Competencies</h3>
-                    <ul class="skill-list">
-                        <li><span>Python / C++</span> <strong>Intermediate</strong></li>
-                        <li><span>Web Security</span> <strong>Basic</strong></li>
-                        <li><span>SQL / Data Analysis</span> <strong>Intermediate</strong></li>
-                        <li><span>Web Development</span> <strong>Basic</strong></li>
-                        <li><span>Photo Editing</span> <strong>Intermediate</strong></li>
-                        <li><span>Data Analysis</span> <strong>Proficient</strong></li>
-                    </ul>
+                    <h3 data-en="Core Competencies" data-jp="主なスキル">Core Competencies</h3>
+                    <div class="tech-stack">
+                        <div class="tech-item">
+                            <span class="tech-cat" data-en="Languages" data-jp="言語">Languages</span>
+                            <span class="tech-val">Python, C++, SQL, Bash</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-cat" data-en="Security Focus" data-jp="セキュリティ">Security Focus</span>
+                            <span class="tech-val">Threat Analysis, Web Sec, Logs</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-cat" data-en="Data Tools" data-jp="データツール">Data Tools</span>
+                            <span class="tech-val">Excel, Pandas, Matplotlib</span>
+                        </div>
+                        <div class="tech-item">
+                            <span class="tech-cat" data-en="Creative" data-jp="クリエイティブ">Creative</span>
+                            <span class="tech-val">Photo Editing, UI/UX Concepts</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
-                    <h3>Connect</h3>
+                    <h3 data-en="Connect" data-jp="連絡先">Connect</h3>
                     <div class="social-links">
                         <a href="https://github.com/Prasad3Suryavanshi" target="_blank"><i class="fab fa-github"></i></a>
                         <a href="https://in.linkedin.com/in/prasad-suryavanshi" target="_blank"><i class="fab fa-linkedin-in"></i></a>
@@ -423,124 +585,121 @@
                 </div>
 
                 <div>
-                    <h3>Send a Message</h3>
+                    <h3 data-en="Send a Message" data-jp="メッセージを送る">Send a Message</h3>
                     <form class="inquiry-form" action="https://getform.io/f/adrgpdoa" method="POST">
-                        <input type="text" name="name" class="form-input" placeholder="Your Name" required>
-                        <input type="email" name="email" class="form-input" placeholder="Your Email" required>
-                        <textarea name="message" class="form-input" rows="3" placeholder="I'd love to chat about..." required></textarea>
-                        <button type="submit" class="form-btn">Send Inquiry &rarr;</button>
+                        <input type="text" name="name" class="form-input" placeholder="Your Name / お名前" required>
+                        <input type="email" name="email" class="form-input" placeholder="Your Email / メールアドレス" required>
+                        <textarea name="message" class="form-input" rows="3" placeholder="Message / メッセージ..." required></textarea>
+                        <button type="submit" class="form-btn" data-en="Send Inquiry &rarr;" data-jp="送信する &rarr;">Send Inquiry &rarr;</button>
                     </form>
                 </div>
-
             </aside>
         </div>
 
         <div class="section-header">
-            <span>Detailed Experience Ledger</span>
+            <span data-en="Detailed Experience Ledger" data-jp="経歴・実績詳細">Detailed Experience Ledger</span>
         </div>
 
         <div class="timeline-wrapper">
-            
             <div class="timeline-col">
-                <h3>Projects & Experience</h3>
-                
+                <h3 data-en="Projects & Experience" data-jp="プロジェクトと経験">Projects & Experience</h3>
                 <div class="timeline-item">
-                    <span class="timeline-date">Self-Taught Project</span>
-                    <h4 class="timeline-title">Published Python Library: SaucyPass</h4>
+                    <span class="timeline-date" data-en="Self-Taught Project" data-jp="個人プロジェクト">Self-Taught Project</span>
+                    <h4 class="timeline-title">SaucyPass (Library)</h4>
                     <span class="timeline-org">PyPi</span>
-                    <p class="timeline-desc">
-                        Developed and published a Python library that creates memorable passwords using personal cues. Focused on balancing security strength with user recall ease.
+                    <p class="timeline-desc" data-en="Developed and published a Python library that creates memorable passwords using personal cues. Focused on balancing security strength with user recall ease."
+                       data-jp="個人的な手がかりを使用して覚えやすいパスワードを作成するPythonライブラリを開発・公開しました。セキュリティ強度とユーザーの記憶しやすさのバランスに焦点を当てています。">
+                        Developed and published a Python library that creates memorable passwords using personal cues.
                     </p>
                 </div>
-
                 <div class="timeline-item">
-                    <span class="timeline-date">Self-Taught Project</span>
-                    <h4 class="timeline-title">Published Python Library: Terminal Clock</h4>
+                    <span class="timeline-date" data-en="Self-Taught Project" data-jp="個人プロジェクト">Self-Taught Project</span>
+                    <h4 class="timeline-title">Terminal Clock (CLI)</h4>
                     <span class="timeline-org">PyPi</span>
-                    <p class="timeline-desc">
-                        Created a customizable terminal clock library. Gained hands-on experience in packaging Python projects, Bash scripting, and CLI design.
+                    <p class="timeline-desc" data-en="Created a customizable terminal clock library. Gained hands-on experience in packaging Python projects, Bash scripting, and CLI design."
+                       data-jp="カスタマイズ可能なターミナル時計ライブラリを作成しました。Pythonプロジェクトのパッケージング、Bashスクリプト、CLI設計の実践的な経験を得ました。">
+                        Created a customizable terminal clock library. Gained hands-on experience in packaging Python projects.
                     </p>
                 </div>
-
                 <div class="timeline-item">
-                    <span class="timeline-date">Virtual Job Simulation</span>
-                    <h4 class="timeline-title">Cybersecurity Analyst</h4>
-                    <span class="timeline-org">Deloitte Australia (Forage)</span>
-                    <p class="timeline-desc">
-                        Conducted log analysis to identify potential security incidents. Performed vulnerability assessments and developed comprehensive incident response plans.
+                    <span class="timeline-date" data-en="Virtual Job Simulation" data-jp="バーチャルジョブシミュレーション">Virtual Job Simulation</span>
+                    <h4 class="timeline-title" data-en="Cybersecurity Analyst" data-jp="サイバーセキュリティアナリスト">Cybersecurity Analyst</h4>
+                    <span class="timeline-org">Deloitte Australia</span>
+                    <p class="timeline-desc" data-en="Conducted log analysis to identify potential security incidents. Performed vulnerability assessments and developed comprehensive incident response plans."
+                       data-jp="ログ分析を行い、潜在的なセキュリティインシデントを特定しました。脆弱性評価を実施し、包括的なインシデント対応計画を策定しました。">
+                        Conducted log analysis to identify potential security incidents and developed incident response plans.
                     </p>
                 </div>
-
                 <div class="timeline-item">
-                    <span class="timeline-date">Virtual Job Simulation</span>
-                    <h4 class="timeline-title">Excel Skills & Data Analysis</h4>
-                    <span class="timeline-org">JPMorgan Chase & Co. (Forage)</span>
-                    <p class="timeline-desc">
-                        Developed interactive dashboards for financial data analysis. Created complex financial models and automated data processing tasks to drive insights.
+                    <span class="timeline-date" data-en="Virtual Job Simulation" data-jp="バーチャルジョブシミュレーション">Virtual Job Simulation</span>
+                    <h4 class="timeline-title" data-en="Excel Skills & Data Analysis" data-jp="Excelスキルとデータ分析">Excel Skills & Data Analysis</h4>
+                    <span class="timeline-org">JPMorgan Chase & Co.</span>
+                    <p class="timeline-desc" data-en="Developed interactive dashboards for financial data analysis. Created complex financial models and automated data processing tasks to drive insights."
+                       data-jp="財務データ分析のためのインタラクティブなダッシュボードを開発しました。複雑な財務モデルを作成し、データ処理タスクを自動化しました。">
+                        Developed interactive dashboards for financial data analysis and automated data processing tasks.
                     </p>
                 </div>
             </div>
 
             <div class="timeline-col">
-                <h3>Education & Workshops</h3>
-                
+                <h3 data-en="Education & Workshops" data-jp="教育とワークショップ">Education & Workshops</h3>
                 <div class="timeline-item">
-                    <span class="timeline-date">50-Day Intensive</span>
-                    <h4 class="timeline-title">Full Stack Development Workshop</h4>
+                    <span class="timeline-date" data-en="50-Day Intensive" data-jp="50日間集中講座">50-Day Intensive</span>
+                    <h4 class="timeline-title" data-en="Full Stack Development" data-jp="フルスタック開発ワークショップ">Full Stack Development</h4>
                     <span class="timeline-org">MRCET</span>
-                    <p class="timeline-desc">
-                        Successfully completed a rigorous 50-day workshop gaining hands-on experience with HTML, CSS, JavaScript, JSON, and key web libraries.
+                    <p class="timeline-desc" data-en="Successfully completed a rigorous 50-day workshop gaining hands-on experience with HTML, CSS, JavaScript, JSON, and key web libraries."
+                       data-jp="HTML、CSS、JavaScript、JSON、および主要なWebライブラリの実践的な経験を得る50日間の厳しいワークショップを修了しました。">
+                        Successfully completed a rigorous 50-day workshop gaining hands-on experience with HTML, CSS, & JS.
                     </p>
                 </div>
-
                 <div class="timeline-item">
-                    <span class="timeline-date">3-Day Intensive</span>
-                    <h4 class="timeline-title">Web Development Workshop</h4>
+                    <span class="timeline-date" data-en="3-Day Intensive" data-jp="3日間集中講座">3-Day Intensive</span>
+                    <h4 class="timeline-title" data-en="Web Development" data-jp="Web開発ワークショップ">Web Development</h4>
                     <span class="timeline-org">MRCET</span>
-                    <p class="timeline-desc">
-                        Learned modern web frameworks and best practices. Developed responsive web applications with initial security considerations.
+                    <p class="timeline-desc" data-en="Learned modern web frameworks and best practices. Developed responsive web applications with initial security considerations."
+                       data-jp="最新のWebフレームワークとベストプラクティスを学びました。セキュリティを考慮したレスポンシブWebアプリケーションを開発しました。">
+                        Learned modern web frameworks and best practices. Developed responsive web applications.
                     </p>
                 </div>
-
                 <div class="timeline-item">
-                    <span class="timeline-date">2-Day Seminar</span>
-                    <h4 class="timeline-title">Generative AI Workshop</h4>
+                    <span class="timeline-date" data-en="2-Day Seminar" data-jp="2日間セミナー">2-Day Seminar</span>
+                    <h4 class="timeline-title" data-en="Generative AI Workshop" data-jp="生成AIワークショップ">Generative AI Workshop</h4>
                     <span class="timeline-org">IIT Hyderabad</span>
-                    <p class="timeline-desc">
-                        Explored fundamentals of generative AI models including GANs. Gained hands-on experience in text-to-image generation and discussed ethical implications.
+                    <p class="timeline-desc" data-en="Explored fundamentals of generative AI models including GANs. Gained hands-on experience in text-to-image generation and discussed ethical implications."
+                       data-jp="GANを含む生成AIモデルの基礎を探求しました。テキストから画像への生成の実践的な経験を得て、倫理的な影響について議論しました。">
+                        Explored fundamentals of generative AI models including GANs.
                     </p>
                 </div>
             </div>
-
         </div>
 
         <div class="section-header">
-            <span>Certifications</span>
+            <span data-en="Certifications" data-jp="資格">Certifications</span>
         </div>
 
         <section class="cert-list">
             <div class="cert-item">
-                <span class="cert-title">Fundamentals of Business Analysis</span>
+                <span class="cert-title" data-en="Fundamentals of Business Analysis" data-jp="ビジネス分析の基礎">Fundamentals of Business Analysis</span>
                 <span class="cert-issuer">Coursera (2023)</span>
             </div>
             <div class="cert-item">
-                <span class="cert-title">Introduction to Data Science</span>
+                <span class="cert-title" data-en="Introduction to Data Science" data-jp="データサイエンス入門">Introduction to Data Science</span>
                 <span class="cert-issuer">Cisco Networking Academy (2023)</span>
             </div>
             <div class="cert-item">
-                <span class="cert-title">Python for Data Science</span>
+                <span class="cert-title" data-en="Python for Data Science" data-jp="データサイエンスのためのPython">Python for Data Science</span>
                 <span class="cert-issuer">NPTEL (2023)</span>
             </div>
             <div class="cert-item">
-                <span class="cert-title">Cyber Job Simulation</span>
+                <span class="cert-title" data-en="Cyber Job Simulation" data-jp="サイバーセキュリティシミュレーション">Cyber Job Simulation</span>
                 <span class="cert-issuer">Deloitte Australia (2023)</span>
             </div>
             <div class="cert-item">
-                <span class="cert-title">Excel Skills Simulation</span>
+                <span class="cert-title" data-en="Excel Skills Simulation" data-jp="Excelスキルシミュレーション">Excel Skills Simulation</span>
                 <span class="cert-issuer">JPMorgan Chase (2023)</span>
             </div>
             <div class="cert-item">
-                <span class="cert-title">English Proficiency (C1)</span>
+                <span class="cert-title" data-en="English Proficiency (C1)" data-jp="英語能力証明 (C1)">English Proficiency (C1)</span>
                 <span class="cert-issuer">Cambridge Empower</span>
             </div>
         </section>
@@ -553,20 +712,69 @@
     </div>
 
     <script>
-        // 1. DYNAMIC DATE & CLOCK
+        // 1. DYNAMIC DATE
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', options).toUpperCase();
         document.getElementById('year').innerText = new Date().getFullYear();
 
-        function updateClock() {
+        // 2. FALLING CLOCK (Anime.js)
+        function updateClockAnime() {
+            const clockContainer = document.getElementById('anime-clock');
             const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', {hour12: true});
-            document.getElementById('live-clock').innerText = timeString;
+            const timeString = now.toLocaleTimeString('en-US', {hour12: true}); 
+            
+            // Initial Setup
+            if(clockContainer.childElementCount === 0) {
+                timeString.split('').forEach(char => {
+                    const span = document.createElement('span');
+                    // Class distinctions for spacing
+                    if (char === ':') span.className = 'clock-char clock-colon';
+                    else if (char === ' ') span.className = 'clock-char';
+                    else if (isNaN(char)) span.className = 'clock-char clock-ampm';
+                    else span.className = 'clock-char';
+                    
+                    span.innerText = char;
+                    clockContainer.appendChild(span);
+                });
+            } else {
+                // Update
+                const spans = clockContainer.children;
+                const newChars = timeString.split('');
+                
+                newChars.forEach((char, index) => {
+                    if(spans[index] && spans[index].innerText !== char) {
+                        const target = spans[index];
+                        
+                        // 1. Fall Down (Exit)
+                        anime({
+                            targets: target,
+                            translateY: [0, '1em'],
+                            opacity: [1, 0],
+                            duration: 250,
+                            easing: 'easeInQuad',
+                            complete: function() {
+                                // 2. Change Content & Reset Position to Top
+                                target.innerText = char;
+                                target.style.transform = 'translateY(-1em)';
+                                
+                                // 3. Fall In (Enter)
+                                anime({
+                                    targets: target,
+                                    translateY: ['-1em', 0],
+                                    opacity: [0, 1],
+                                    duration: 250,
+                                    easing: 'easeOutQuad'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(updateClockAnime, 1000);
+        updateClockAnime();
 
-        // 2. THEME TOGGLE
+        // 3. THEME TOGGLE
         const themeBtn = document.getElementById('theme-toggle');
         const body = document.body;
         if(localStorage.getItem('theme') === 'dark') {
@@ -581,66 +789,148 @@
             }
         });
 
-        // 3. NAME DECODE ANIMATION (HACKER EFFECT)
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const nameElement = document.querySelector("h1.masthead");
-        
+        // 4. NAME ANIMATION: ELASTIC POP
         window.onload = () => {
-            let iteration = 0;
-            const originalText = nameElement.dataset.value;
-            let interval = setInterval(() => {
-                nameElement.innerText = originalText
-                .split("")
-                .map((letter, index) => {
-                    if(index < iteration) {
-                        return originalText[index];
-                    }
-                    return letter === " " ? " " : letters[Math.floor(Math.random() * 26)];
-                })
-                .join("");
+            // Apply to both parts
+            document.querySelectorAll('.name-part').forEach(part => {
+                part.innerHTML = part.textContent.replace(/\S/g, "<span class='name-char'>$&</span>");
+            });
 
-                if(iteration >= originalText.length) { 
-                    clearInterval(interval);
-                }
-                
-                iteration += 1 / 5; 
-            }, 30);
+            anime.timeline({loop: false})
+            .add({
+                targets: '.name-char',
+                scale: [0, 1],
+                translateY: [50, 0],
+                opacity: [0, 1],
+                duration: 1200,
+                delay: anime.stagger(50), 
+                easing: 'easeOutElastic(1, .6)' // Bouncy effect
+            });
         }
 
-        // 4. SUBHEADING TYPEWRITER LOOP
-        const roleText = document.getElementById('role-text');
-        const roles = ["Aspiring Cybersecurity Analyst", "Business and Data Analyst"];
-        let roleIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        let typeSpeed = 100;
+        // 5. LANGUAGE TOGGLE (Cascading)
+        const langBtn = document.getElementById('lang-toggle');
+        let currentLang = 'en';
+        
+        const phrasesEn = ["Aspiring Cybersecurity Analyst", "Business and Data Analyst"];
+        const phrasesJp = ["サイバーセキュリティアナリスト志望", "ビジネス・データアナリスト"];
+        let currentPhrases = phrasesEn; 
 
-        function typeLoop() {
-            const currentRole = roles[roleIndex];
-            
-            if (isDeleting) {
-                roleText.textContent = currentRole.substring(0, charIndex - 1);
-                charIndex--;
-                typeSpeed = 50; 
+        let subheadingTimeout;
+        let roleAnim;
+
+        langBtn.addEventListener('click', () => {
+            if(currentLang === 'en') {
+                document.body.classList.add('lang-jp');
             } else {
-                roleText.textContent = currentRole.substring(0, charIndex + 1);
-                charIndex++;
-                typeSpeed = 100;
+                document.body.classList.remove('lang-jp');
             }
 
-            if (!isDeleting && charIndex === currentRole.length) {
-                isDeleting = true;
-                typeSpeed = 2000; 
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                roleIndex = (roleIndex + 1) % roles.length; 
-                typeSpeed = 500; 
-            }
+            const goingToJp = currentLang === 'en';
+            const outTranslateY = goingToJp ? -20 : 20; 
+            const inTranslateY = goingToJp ? 20 : -20;  
+            
+            currentLang = goingToJp ? 'jp' : 'en';
+            langBtn.innerText = currentLang === 'en' ? 'JP' : 'EN';
+            
+            const elements = document.querySelectorAll('[data-en]');
+            
+            // Staggered Exit
+            anime.timeline({loop: false})
+            .add({
+                targets: elements,
+                opacity: 0,
+                filter: 'blur(10px)',
+                translateY: outTranslateY,
+                duration: 400,
+                delay: anime.stagger(20),
+                easing: 'easeInQuad',
+                complete: () => {
+                    // Swap Content
+                    elements.forEach(el => {
+                        if(el.classList.contains('name-part')) {
+                            el.textContent = currentLang === 'jp' ? el.getAttribute('data-jp') : el.getAttribute('data-en');
+                            // Re-wrap letters for potential future animations
+                            el.innerHTML = el.textContent.replace(/\S/g, "<span class='name-char'>$&</span>");
+                        }
+                        else if(el.tagName === 'SPAN' || el.tagName === 'H2' || el.tagName === 'P' || el.tagName === 'H3' || el.tagName === 'H4' || el.tagName === 'DIV' || el.classList.contains('form-btn') || el.classList.contains('tech-cat')) {
+                            if(currentLang === 'jp') {
+                                if(el.querySelector('strong') || el.classList.contains('highlight-box')) {
+                                     el.innerHTML = el.getAttribute('data-jp');
+                                } else {
+                                     el.textContent = el.getAttribute('data-jp');
+                                }
+                            } else {
+                                if(el.querySelector('strong') || el.classList.contains('highlight-box')) {
+                                     el.innerHTML = el.getAttribute('data-en');
+                                } else {
+                                     el.textContent = el.getAttribute('data-en');
+                                }
+                            }
+                        }
+                    });
 
-            setTimeout(typeLoop, typeSpeed);
+                    // Reset Subheading Loop
+                    currentPhrases = currentLang === 'en' ? phrasesEn : phrasesJp;
+                    clearTimeout(subheadingTimeout);
+                    if(roleAnim) roleAnim.pause();
+                    anime.remove('.role-text .letter');
+                    anime.remove('.role-text');
+                    currentPhraseIndex = 0;
+                    animateText(); 
+                }
+            })
+            // Staggered Enter
+            .add({
+                targets: elements,
+                opacity: 1,
+                filter: ['blur(10px)', 'blur(0px)'],
+                translateY: [inTranslateY, 0],
+                duration: 600,
+                delay: anime.stagger(30), 
+                easing: 'easeOutQuad'
+            });
+        });
+
+        // 6. SUBHEADING LOOP
+        const textWrapper = document.querySelector('.role-text');
+        let currentPhraseIndex = 0;
+
+        function animateText() {
+            textWrapper.textContent = currentPhrases[currentPhraseIndex];
+            textWrapper.innerHTML = textWrapper.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+
+            roleAnim = anime.timeline({loop: false})
+            .add({
+                targets: '.role-text .letter',
+                translateY: ["-1.5em", 0], 
+                opacity: [0, 1],
+                easing: "easeOutExpo",
+                duration: 800,
+                delay: (el, i) => 40 * i
+            })
+            .add({
+                targets: '.role-text',
+                opacity: 1, 
+                duration: 2500, 
+                easing: "linear"
+            })
+            .add({
+                targets: '.role-text .letter',
+                translateY: [0, "1.5em"],
+                opacity: [1, 0],
+                easing: "easeInExpo",
+                duration: 600,
+                delay: (el, i) => 30 * i,
+                complete: function() {
+                    currentPhraseIndex = (currentPhraseIndex + 1) % currentPhrases.length;
+                    subheadingTimeout = setTimeout(animateText, 100);
+                }
+            });
         }
 
-        setTimeout(typeLoop, 1000);
+        subheadingTimeout = setTimeout(animateText, 500);
+
     </script>
 </body>
 </html>
