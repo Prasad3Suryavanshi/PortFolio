@@ -17,9 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
     <style>
-        /* --- CONFIGURATION --- */
         :root {
-            /* Light Mode */
             --bg-body: #f4f4f2; 
             --bg-paper: #ffffff;
             --ink-color: #1a1a1a;
@@ -27,7 +25,6 @@
             --border-color: #222222;
             --primary-color: #0056b3; 
             
-            /* Fonts */
             --font-head: 'Playfair Display', serif;
             --font-jp: 'Shippori Mincho', serif;
             --font-body: 'Lora', 'Shippori Mincho', serif;
@@ -39,7 +36,6 @@
             --spacing-lg: 80px;
         }
 
-        /* Dark Mode */
         body.dark-mode {
             --bg-body: #1e1e1e;
             --bg-paper: #2d2d2d; 
@@ -70,7 +66,6 @@
         a { text-decoration: none; color: inherit; transition: 0.2s; }
         a:hover { color: var(--primary-color); }
         
-        /* --- MAIN CONTAINER --- */
         .paper-container {
             max-width: 1100px;
             margin: 60px auto;
@@ -82,10 +77,9 @@
             transition: background-color 0.3s ease;
         }
 
-        /* --- HEADER --- */
         header {
             text-align: center;
-            border-bottom: 3px double var(--border-color); /* RESTORED STRAIGHT LINE */
+            border-bottom: 3px double var(--border-color);
             padding-bottom: var(--spacing-md);
             margin-bottom: var(--spacing-lg);
         }
@@ -110,7 +104,6 @@
             gap: 15px;
         }
 
-        /* --- FALLING CLOCK STYLES --- */
         .clock-container {
             display: flex;
             align-items: center;
@@ -118,7 +111,7 @@
             font-family: var(--font-mono);
             font-size: 1rem;
             height: 1.5em;
-            overflow: hidden; /* Important for falling effect */
+            overflow: hidden; 
             position: relative;
         }
 
@@ -156,7 +149,6 @@
             border-radius: 4px;
         }
 
-        /* --- FIXED NAME STYLING (Stacked & No Wrap) --- */
         h1.masthead {
             font-family: var(--font-head);
             font-weight: 900;
@@ -171,19 +163,15 @@
 
         .name-part {
             display: block; 
-            /* Clamp ensures it fits mobile (8vw) and doesn't get too huge on desktop (6rem) */
             font-size: clamp(2.5rem, 10vw, 6rem); 
-            white-space: nowrap; /* PREVENTS "HI" BREAKING OFF */
+            white-space: nowrap; 
             position: relative; 
-            /* No initial opacity here, we let anime.js handle it */
         }
 
-        /* English Spacing */
         body:not(.lang-jp) .name-part {
             letter-spacing: -2px;
         }
 
-        /* Japanese Spacing */
         body.lang-jp h1.masthead {
             font-family: var(--font-jp);
             font-weight: 700;
@@ -195,13 +183,11 @@
             letter-spacing: 0.05em;
         }
 
-        /* Anime.js Letter Target */
         .name-char {
             display: inline-block;
             transform-origin: center center;
         }
 
-        /* --- SUBHEADING --- */
         .role-container {
             font-family: var(--font-mono);
             font-size: 1.15rem; 
@@ -224,7 +210,6 @@
             transform-origin: 50% 100%;
         }
 
-        /* --- LAYOUT GRID --- */
         .main-grid {
             display: grid;
             grid-template-columns: 1.8fr 1fr;
@@ -279,7 +264,6 @@
         
         body.lang-jp .sidebar h3 { font-family: var(--font-jp); }
 
-        /* Tech Specs */
         .tech-stack {
             display: flex;
             flex-direction: column;
@@ -311,7 +295,6 @@
 
         .tech-val { color: var(--ink-color); line-height: 1.4; }
 
-        /* Social Icons */
         .social-links { 
             display: flex; 
             justify-content: center; 
@@ -324,7 +307,6 @@
             color: var(--primary-color);
         }
 
-        /* Form */
         .inquiry-form { display: flex; flex-direction: column; gap: 20px; }
         .form-input {
             width: 100%; padding: 15px;
@@ -355,7 +337,6 @@
             border-radius: 8px;
         }
 
-        /* --- SECTION HEADERS (Classic) --- */
         .section-header {
             text-align: center; 
             margin-bottom: 60px;
@@ -381,7 +362,6 @@
         
         .section-header span { position: relative; z-index: 2; }
 
-        /* --- TIMELINE --- */
         .timeline-wrapper {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -447,7 +427,6 @@
             opacity: 0.95;
         }
 
-        /* Certifications List */
         .cert-list {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px; 
@@ -469,7 +448,6 @@
             font-size: 0.9rem; opacity: 0.7; font-family: var(--font-mono);
         }
 
-        /* --- RESPONSIVE --- */
         @media (max-width: 1024px) {
             .paper-container { width: 95%; margin: 40px auto; padding: 40px; }
             .main-grid { grid-template-columns: 1fr; gap: 50px; }
@@ -487,7 +465,6 @@
             .cert-list { grid-template-columns: 1fr; }
             .section-header { font-size: 1.6rem; margin-bottom: 40px; }
             
-            /* Ensures SURYAVANSHI fits on mobile */
             .name-part { font-size: 12vw; } 
         }
     </style>
@@ -712,22 +689,18 @@
     </div>
 
     <script>
-        // 1. DYNAMIC DATE
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', options).toUpperCase();
         document.getElementById('year').innerText = new Date().getFullYear();
 
-        // 2. FALLING CLOCK (Anime.js)
         function updateClockAnime() {
             const clockContainer = document.getElementById('anime-clock');
             const now = new Date();
             const timeString = now.toLocaleTimeString('en-US', {hour12: true}); 
             
-            // Initial Setup
             if(clockContainer.childElementCount === 0) {
                 timeString.split('').forEach(char => {
                     const span = document.createElement('span');
-                    // Class distinctions for spacing
                     if (char === ':') span.className = 'clock-char clock-colon';
                     else if (char === ' ') span.className = 'clock-char';
                     else if (isNaN(char)) span.className = 'clock-char clock-ampm';
@@ -737,7 +710,6 @@
                     clockContainer.appendChild(span);
                 });
             } else {
-                // Update
                 const spans = clockContainer.children;
                 const newChars = timeString.split('');
                 
@@ -745,7 +717,6 @@
                     if(spans[index] && spans[index].innerText !== char) {
                         const target = spans[index];
                         
-                        // 1. Fall Down (Exit)
                         anime({
                             targets: target,
                             translateY: [0, '1em'],
@@ -753,11 +724,9 @@
                             duration: 250,
                             easing: 'easeInQuad',
                             complete: function() {
-                                // 2. Change Content & Reset Position to Top
                                 target.innerText = char;
                                 target.style.transform = 'translateY(-1em)';
                                 
-                                // 3. Fall In (Enter)
                                 anime({
                                     targets: target,
                                     translateY: ['-1em', 0],
@@ -774,7 +743,6 @@
         setInterval(updateClockAnime, 1000);
         updateClockAnime();
 
-        // 3. THEME TOGGLE
         const themeBtn = document.getElementById('theme-toggle');
         const body = document.body;
         if(localStorage.getItem('theme') === 'dark') {
@@ -789,9 +757,7 @@
             }
         });
 
-        // 4. NAME ANIMATION: ELASTIC POP
         window.onload = () => {
-            // Apply to both parts
             document.querySelectorAll('.name-part').forEach(part => {
                 part.innerHTML = part.textContent.replace(/\S/g, "<span class='name-char'>$&</span>");
             });
@@ -804,11 +770,10 @@
                 opacity: [0, 1],
                 duration: 1200,
                 delay: anime.stagger(50), 
-                easing: 'easeOutElastic(1, .6)' // Bouncy effect
+                easing: 'easeOutElastic(1, .6)' 
             });
         }
 
-        // 5. LANGUAGE TOGGLE (Cascading)
         const langBtn = document.getElementById('lang-toggle');
         let currentLang = 'en';
         
@@ -835,7 +800,6 @@
             
             const elements = document.querySelectorAll('[data-en]');
             
-            // Staggered Exit
             anime.timeline({loop: false})
             .add({
                 targets: elements,
@@ -846,11 +810,9 @@
                 delay: anime.stagger(20),
                 easing: 'easeInQuad',
                 complete: () => {
-                    // Swap Content
                     elements.forEach(el => {
                         if(el.classList.contains('name-part')) {
                             el.textContent = currentLang === 'jp' ? el.getAttribute('data-jp') : el.getAttribute('data-en');
-                            // Re-wrap letters for potential future animations
                             el.innerHTML = el.textContent.replace(/\S/g, "<span class='name-char'>$&</span>");
                         }
                         else if(el.tagName === 'SPAN' || el.tagName === 'H2' || el.tagName === 'P' || el.tagName === 'H3' || el.tagName === 'H4' || el.tagName === 'DIV' || el.classList.contains('form-btn') || el.classList.contains('tech-cat')) {
@@ -870,7 +832,6 @@
                         }
                     });
 
-                    // Reset Subheading Loop
                     currentPhrases = currentLang === 'en' ? phrasesEn : phrasesJp;
                     clearTimeout(subheadingTimeout);
                     if(roleAnim) roleAnim.pause();
@@ -880,7 +841,6 @@
                     animateText(); 
                 }
             })
-            // Staggered Enter
             .add({
                 targets: elements,
                 opacity: 1,
@@ -892,7 +852,6 @@
             });
         });
 
-        // 6. SUBHEADING LOOP
         const textWrapper = document.querySelector('.role-text');
         let currentPhraseIndex = 0;
 
@@ -934,3 +893,4 @@
     </script>
 </body>
 </html>
+
