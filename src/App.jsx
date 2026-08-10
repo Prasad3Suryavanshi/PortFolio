@@ -717,7 +717,7 @@ export default function App() {
       {/* Conditionally render the zoomed QR code overlay */}
       {isQrZoomed && (
         <div className="qr-overlay" onClick={() => setIsQrZoomed(false)}>
-          <img src="public/qr.jpeg" alt="Enlarged QR Code" />
+          <img src="./qr.jpeg" alt="Enlarged QR Code" />
           <span className="close-instruction">Click anywhere to close</span>
         </div>
       )}
