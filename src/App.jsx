@@ -1,5 +1,72 @@
 import { useEffect, useRef, useState } from 'react'
 import Lenis from 'lenis'
+import QRCode from 'react-qr-code'
+
+// Audio setup with clean, consistent sounds
+let audioContext = null
+let audioInitialized = false
+
+const initAudio = () => {
+  if (audioInitialized) return
+  
+  try {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    audioInitialized = true
+    console.log('🎵 Audio initialized')
+  } catch (err) {
+    console.warn('Audio not available:', err)
+  }
+}
+
+// Clean sound generation - consistent frequencies
+const playTone = (frequency = 800, duration = 0.08, volume = 0.12, type = 'sine') => {
+  try {
+    if (!audioContext || audioContext.state === 'suspended') {
+      if (audioContext) {
+        audioContext.resume()
+      } else {
+        initAudio()
+        if (!audioContext) return
+      }
+    }
+    
+    const oscillator = audioContext.createOscillator()
+    const gainNode = audioContext.createGain()
+    
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+    
+    oscillator.frequency.value = frequency
+    oscillator.type = type
+    
+    gainNode.gain.setValueAtTime(0.001, audioContext.currentTime)
+    gainNode.gain.exponentialRampToValueAtTime(volume, audioContext.currentTime + 0.01)
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration)
+    
+    oscillator.start(audioContext.currentTime)
+    oscillator.stop(audioContext.currentTime + duration)
+  } catch (err) {
+    // Silent fail
+  }
+}
+
+// Simple, consistent sound types
+const playSound = {
+  hover: () => playTone(660, 0.04, 0.06),
+  tap: () => playTone(770, 0.05, 0.08),
+  click: () => playTone(880, 0.08, 0.10),
+  select: () => playTone(770, 0.06, 0.09),
+  error: () => {
+    playTone(300, 0.15, 0.10, 'sawtooth')
+    setTimeout(() => playTone(250, 0.15, 0.08, 'sawtooth'), 50)
+  },
+  success: () => {
+    const notes = [523, 659, 784]
+    notes.forEach((freq, i) => {
+      setTimeout(() => playTone(freq, 0.12, 0.10), i * 80)
+    })
+  },
+}
 
 const SECTIONS = [
   { id: 'about', label: 'about' },
@@ -181,10 +248,8 @@ const EDUCATION = [
   },
 ]
 
-// Bilingual strings for UI and Section Headers
 const TRANSLATIONS = {
   role: { en: 'Aspiring Cybersecurity Analyst', jp: '志望サイバーセキュリティアナリスト' },
-  
   aboutLabel: { en: 'about', jp: 'プロフィール' },
   aboutIndex: { en: '01 / profile', jp: '01 / プロフィール' },
   bio: {
@@ -196,19 +261,14 @@ const TRANSLATIONS = {
     en: 'Start my career in Japan and contribute to both Japanese and Indian tech ecosystems.',
     jp: '日本でキャリアをスタートし、日印双方の技術エコシステムに貢献したい。',
   },
-
   workLabel: { en: 'selected work', jp: '選ばれた作品' },
   workIndex: { en: '02 / projects', jp: '02 / プロジェクト' },
-
   expLabel: { en: 'experience', jp: '経歴' },
   expIndex: { en: '03 / roles', jp: '03 / 役割' },
-
   skillsLabel: { en: 'skills', jp: 'スキル' },
   skillsIndex: { en: '04 / stack', jp: '04 / スタック' },
-
   certLabel: { en: 'certifications', jp: '資格' },
   certIndex: { en: '05 / credentials', jp: '05 / 証明書' },
-
   achLabel: { en: 'achievements', jp: '実績' },
   achIndex: { en: '06 / competitions', jp: '06 / 競技' },
   achJailCtfDesc: {
@@ -219,14 +279,11 @@ const TRANSLATIONS = {
     en: 'Active in Google Developer Groups CTF collaboration and security workshops; completed intensive AI-mechanisms training at IIT Hyderabad. Contributor to the kana-dojo open-source repository.',
     jp: 'Google Developer GroupsのCTFコラボレーションやセキュリティワークショップに参加。IITハイデラバードでの集中的なAIメカニズムトレーニングを修了。kana-dojoオープンソースリポジトリのコントリビューター。'
   },
-
   eduLabel: { en: 'education', jp: '学歴' },
   eduIndex: { en: '07 / record', jp: '07 / 記録' },
-
   contactIndex: { en: '08 / get in touch', jp: '08 / お問い合わせ' },
   contactHeadline1: { en: "let's", jp: '繋がり' },
   contactHeadline2: { en: 'connect.', jp: 'ましょう。' },
-  
   contactScan: { en: 'Scan / vCard', jp: 'スキャン / vCard' },
   formName: { en: 'Your name', jp: 'お名前' },
   formNamePlaceholder: { en: 'e.g. John Doe', jp: '例: 山田 太郎' },
@@ -242,12 +299,9 @@ const TRANSLATIONS = {
   langToggle: { en: '日本語', jp: 'English' },
 }
 
-// Splits strings and applies an upward stagger effect letter-by-letter
 function AnimateText({ text, lang }) {
   if (typeof text !== 'string') return text;
-  
   const tokens = text.split('');
-  
   return (
     <span className="stagger-wrapper" key={lang}>
       {tokens.map((char, i) => (
@@ -265,12 +319,10 @@ function AnimateText({ text, lang }) {
 
 function LiveClock() {
   const [time, setTime] = useState(new Date())
-
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
-
   return (
     <div className="nav-clock">
       {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
@@ -281,7 +333,6 @@ function LiveClock() {
 function Reveal({ children, delay = 0, as: Tag = 'div', className = '', ...rest }) {
   const ref = useRef(null)
   const [visible, setVisible] = useState(false)
-
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -297,7 +348,6 @@ function Reveal({ children, delay = 0, as: Tag = 'div', className = '', ...rest 
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
-
   return (
     <Tag
       ref={ref}
@@ -312,11 +362,9 @@ function Reveal({ children, delay = 0, as: Tag = 'div', className = '', ...rest 
 
 function useParallax(factor = 0.15) {
   const ref = useRef(null)
-
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReduced) return
-
     let ticking = false
     const onScroll = () => {
       if (ticking) return
@@ -332,7 +380,6 @@ function useParallax(factor = 0.15) {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [factor])
-
   return ref
 }
 
@@ -340,7 +387,6 @@ function useLenis() {
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReduced) return
-
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -348,14 +394,12 @@ function useLenis() {
       wheelMultiplier: 1,
       touchMultiplier: 1.2,
     })
-
     let rafId
     function raf(time) {
       lenis.raf(time)
       rafId = requestAnimationFrame(raf)
     }
     rafId = requestAnimationFrame(raf)
-
     return () => {
       cancelAnimationFrame(rafId)
       lenis.destroy()
@@ -363,19 +407,148 @@ function useLenis() {
   }, [])
 }
 
+// QR Code 3D hover effect component
+function QRCode3D({ value, size = 140 }) {
+  const wrapperRef = useRef(null)
+  const [rotation, setRotation] = useState({ x: 0, y: 0 })
+  
+  const handleMouseMove = (e) => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+    
+    const rect = wrapper.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+    
+    const rotateY = ((x - centerX) / centerX) * 15
+    const rotateX = -((y - centerY) / centerY) * 15
+    
+    setRotation({ x: rotateX, y: rotateY })
+  }
+  
+  const handleMouseLeave = () => {
+    setRotation({ x: 0, y: 0 })
+  }
+  
+  return (
+    <div 
+      ref={wrapperRef}
+      className="qr-wrapper-3d"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: `perspective(800px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+        transition: rotation.x === 0 && rotation.y === 0 ? 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
+      }}
+    >
+      <QRCode 
+        value={value}
+        size={size}
+        bgColor="transparent"
+        fgColor="#111111"
+        level="H"
+        className="qr-code-3d"
+      />
+    </div>
+  )
+}
+
 export default function App() {
   useLenis()
   const [active, setActive] = useState('work')
   const [lang, setLang] = useState('en')
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isFading, setIsFading] = useState(false)
-  const [isQrZoomed, setIsQrZoomed] = useState(false)
+  const [formStatus, setFormStatus] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const refs = useRef({})
-  const heroParallax = useParallax(0.12)
-  const heroBgParallax = useParallax(0.05)
+  const heroRef = useRef(null)
 
   const t = (key) => TRANSLATIONS[key][lang]
-  const toggleLang = () => setLang((l) => (l === 'en' ? 'jp' : 'en'))
+  
+  const toggleLang = () => {
+    playSound.click()
+    setLang((l) => (l === 'en' ? 'jp' : 'en'))
+  }
+
+  const handleUserInteraction = () => {
+    if (!audioInitialized) {
+      initAudio()
+    }
+    if (audioContext && audioContext.state === 'suspended') {
+      audioContext.resume()
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (isSubmitting) return
+    
+    const form = e.target
+    const name = form.name.value.trim()
+    const email = form.email.value.trim()
+    const message = form.message.value.trim()
+    const inquiryType = form.inquiry_type?.value
+    
+    if (!name || !email || !message || !inquiryType) {
+      playSound.error()
+      setFormStatus('error')
+      setTimeout(() => setFormStatus(null), 3000)
+      return
+    }
+    
+    setIsSubmitting(true)
+    setFormStatus(null)
+    
+    try {
+      const formData = new FormData(form)
+      const response = await fetch('https://getform.io/f/adrgpdoa', {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' },
+      })
+      
+      if (response.ok) {
+        playSound.success()
+        setFormStatus('success')
+        form.reset()
+        setTimeout(() => setFormStatus(null), 5000)
+      } else {
+        playSound.error()
+        setFormStatus('error')
+        setTimeout(() => setFormStatus(null), 3000)
+      }
+    } catch (error) {
+      console.error('Form submission error:', error)
+      playSound.error()
+      setFormStatus('error')
+      setTimeout(() => setFormStatus(null), 3000)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Mouse tracking for hero background
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2
+      const y = (e.clientY / window.innerHeight - 0.5) * 2
+      setMousePosition({ x, y })
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
+
+  useEffect(() => {
+    document.addEventListener('click', handleUserInteraction)
+    document.addEventListener('touchstart', handleUserInteraction)
+    return () => {
+      document.removeEventListener('click', handleUserInteraction)
+      document.removeEventListener('touchstart', handleUserInteraction)
+    }
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -408,13 +581,19 @@ export default function App() {
       
       <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
         <div className="nav-left">
-          <button className="lang-toggle" onClick={toggleLang} aria-label="Switch language">
+          <button 
+            className="lang-toggle" 
+            onClick={toggleLang}
+            onMouseEnter={() => playSound.hover()}
+            aria-label="Switch language"
+          >
             <span className="dot" />
             {t('langToggle')}
           </button>
         </div>
         
         <div className="nav-center">
+          <div className="nav-brand">PS</div>
           <LiveClock />
         </div>
         
@@ -426,20 +605,54 @@ export default function App() {
       </nav>
 
       <main className="content-wrapper">
-        {/* HERO */}
-        <header className="hero">
+        {/* HERO with Creative Background */}
+        <header className="hero" ref={heroRef}>
+          <div className="hero-bg">
+            <div 
+              className="hero-bg-gradient"
+              style={{
+                transform: `translate(${mousePosition.x * 20}px, ${mousePosition.y * 20}px)`
+              }}
+            />
+            <div 
+              className="hero-bg-grid"
+              style={{
+                transform: `translate(${mousePosition.x * 10}px, ${mousePosition.y * 10}px)`
+              }}
+            />
+            <div className="hero-bg-glow" />
+            <div className="hero-bg-dots">
+              {[...Array(50)].map((_, i) => (
+                <div 
+                  key={i}
+                  className="hero-dot"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 3}s`,
+                    animationDuration: `${2 + Math.random() * 3}s`,
+                    width: `${2 + Math.random() * 4}px`,
+                    height: `${2 + Math.random() * 4}px`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          
           <div className="hero-top">
             <span><AnimateText text={t('role')} lang={lang}/></span>
-            <span>Hyderabad, India</span>
+            <span className="hero-location">Hyderabad, India</span>
           </div>
+          
           <div className="hero-mid">
-            <h1 className="hero-name" ref={heroParallax}>
+            <h1 className="hero-name" ref={useParallax(0.12)}>
               prasad
               <br />
               suryavanshi<span className="accent">.</span>
             </h1>
           </div>
-          <div className="hero-bottom" ref={heroBgParallax}>
+          
+          <div className="hero-bottom" ref={useParallax(0.05)}>
             <div className="field">
               <span>Focus</span>
               Full-stack engineering & applied security
@@ -459,7 +672,6 @@ export default function App() {
           </div>
         </header>
 
-        {/* ABOUT */}
         <section className="section about" id="about" data-id="about" ref={setRef('about')}>
           <div className="section-inner">
             <Reveal className="section-head">
@@ -478,7 +690,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* WORK */}
         <section className="section" id="work" data-id="work" ref={setRef('work')}>
           <div className="section-inner">
             <Reveal className="section-head">
@@ -504,7 +715,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* EXPERIENCE */}
         <section className="section" id="experience" data-id="experience" ref={setRef('experience')}>
           <div className="section-inner">
             <Reveal className="section-head">
@@ -530,7 +740,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* SKILLS */}
         <section className="section" id="skills" data-id="skills" ref={setRef('skills')}>
           <div className="section-inner">
             <Reveal className="section-head">
@@ -543,7 +752,9 @@ export default function App() {
                   <h4><AnimateText text={col.title[lang]} lang={lang}/></h4>
                   <ul>
                     {col.items.map((item) => (
-                      <li key={item}>{item}</li>
+                      <li key={item}>
+                        {item}
+                      </li>
                     ))}
                   </ul>
                 </Reveal>
@@ -552,7 +763,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* CERTIFICATIONS */}
         <section className="section" id="certifications" data-id="certifications" ref={setRef('certifications')}>
           <div className="section-inner">
             <Reveal className="section-head">
@@ -569,13 +779,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ACHIEVEMENTS */}
-        <section
-          className="section achievements"
-          id="achievements"
-          data-id="achievements"
-          ref={setRef('achievements')}
-        >
+        <section className="section achievements" id="achievements" data-id="achievements" ref={setRef('achievements')}>
           <div className="section-inner">
             <Reveal className="section-head">
               <h2 className="section-title"><AnimateText text={t('achLabel')} lang={lang}/></h2>
@@ -603,7 +807,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* EDUCATION */}
         <section className="section" id="education" data-id="education" ref={setRef('education')}>
           <div className="section-inner">
             <Reveal className="section-head">
@@ -625,7 +828,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* CONTACT */}
         <section className="section contact" id="contact" data-id="contact" ref={setRef('contact')}>
           <div className="section-inner">
             <Reveal className="section-head">
@@ -639,7 +841,6 @@ export default function App() {
               </h2>
             </Reveal>
 
-            {/* NEW 2-COLUMN LAYOUT: Info/QR on Left, Form on Right */}
             <div className="contact-layout">
               <Reveal className="contact-info" delay={0.1}>
                 <div className="field">
@@ -649,62 +850,114 @@ export default function App() {
                 <div className="field">
                   <span className="field-label">Elsewhere</span>
                   <p>
-                    <a href="https://github.com/Prasad3Suryavanshi" target="_blank" rel="noreferrer">
+                    <a 
+                      href="https://github.com/Prasad3Suryavanshi" 
+                      target="_blank" 
+                      rel="noreferrer"
+                      onMouseEnter={() => playSound.hover()}
+                    >
                       GitHub ↗
                     </a>
                     {' · '}
-                    <a href="https://in.linkedin.com/in/prasad-suryavanshi" target="_blank" rel="noreferrer">
+                    <a 
+                      href="https://in.linkedin.com/in/prasad-suryavanshi" 
+                      target="_blank" 
+                      rel="noreferrer"
+                      onMouseEnter={() => playSound.hover()}
+                    >
                       LinkedIn ↗
                     </a>
                   </p>
                 </div>
                 <div className="field">
                   <span className="field-label"><AnimateText text={t('contactScan')} lang={lang}/></span>
-                  <img 
-                    src="/qr.jpeg" 
-                    alt="vCard QR Code" 
-                    className="qr-code" 
-                    onClick={() => setIsQrZoomed(true)} 
-                  />
+                  <QRCode3D value="https://prasad3suryavanshi.github.io/ContactCard/" size={140} />
                 </div>
               </Reveal>
 
               <Reveal delay={0.16}>
-                <form className="contact-form" action="https://getform.io/f/adrgpdoa" method="POST">
+                <form className="contact-form" onSubmit={handleSubmit}>
                   <div className="form-row">
                     <label>
                       <span className="input-title"><AnimateText text={t('formName')} lang={lang}/></span>
-                      <input type="text" name="name" placeholder={t('formNamePlaceholder')} required />
+                      <input 
+                        type="text" 
+                        name="name" 
+                        placeholder={t('formNamePlaceholder')} 
+                        required 
+                        onFocus={() => playSound.tap()}
+                      />
                     </label>
                     <label>
                       <span className="input-title"><AnimateText text={t('formEmail')} lang={lang}/></span>
-                      <input type="email" name="email" placeholder={t('formEmailPlaceholder')} required />
+                      <input 
+                        type="email" 
+                        name="email" 
+                        placeholder={t('formEmailPlaceholder')} 
+                        required 
+                        onFocus={() => playSound.tap()}
+                      />
                     </label>
                   </div>
                   <label>
                     <span className="input-title"><AnimateText text={t('formMessage')} lang={lang}/></span>
-                    <textarea name="message" rows="4" placeholder={t('formMessagePlaceholder')} required />
+                    <textarea 
+                      name="message" 
+                      rows="4" 
+                      placeholder={t('formMessagePlaceholder')} 
+                      required 
+                      onFocus={() => playSound.tap()}
+                    />
                   </label>
                   
                   <div className="radio-group">
                     <span className="radio-group-label"><AnimateText text={t('formCheckLabel')} lang={lang}/></span>
                     <div className="radio-options">
                       <label className="radio-label">
-                        <input type="radio" name="inquiry_type" value="hiring" required />
+                        <input 
+                          type="radio" 
+                          name="inquiry_type" 
+                          value="hiring" 
+                          required 
+                          onChange={() => playSound.select()}
+                        />
                         <span className="radio-text"><AnimateText text={t('formCheckHiring')} lang={lang}/></span>
                       </label>
                       <label className="radio-label">
-                        <input type="radio" name="inquiry_type" value="collab" />
+                        <input 
+                          type="radio" 
+                          name="inquiry_type" 
+                          value="collab" 
+                          onChange={() => playSound.select()}
+                        />
                         <span className="radio-text"><AnimateText text={t('formCheckCollab')} lang={lang}/></span>
                       </label>
                       <label className="radio-label">
-                        <input type="radio" name="inquiry_type" value="general" />
+                        <input 
+                          type="radio" 
+                          name="inquiry_type" 
+                          value="general" 
+                          onChange={() => playSound.select()}
+                        />
                         <span className="radio-text"><AnimateText text={t('formCheckGeneral')} lang={lang}/></span>
                       </label>
                     </div>
                   </div>
 
-                  <button type="submit"><AnimateText text={t('formSubmit')} lang={lang}/></button>
+                  {formStatus === 'success' && (
+                    <div className="form-feedback success">✨ Message sent successfully!</div>
+                  )}
+                  {formStatus === 'error' && (
+                    <div className="form-feedback error">⚠️ Please fill in all fields</div>
+                  )}
+
+                  <button 
+                    type="submit"
+                    onMouseEnter={() => playSound.hover()}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Sending...' : <AnimateText text={t('formSubmit')} lang={lang}/>}
+                  </button>
                 </form>
               </Reveal>
             </div>
@@ -713,14 +966,6 @@ export default function App() {
 
         <footer>© 2026 Prasad Suryavanshi</footer>
       </main>
-
-      {/* Conditionally render the zoomed QR code overlay */}
-      {isQrZoomed && (
-        <div className="qr-overlay" onClick={() => setIsQrZoomed(false)}>
-          <img src="/qr.jpeg" alt="Enlarged QR Code" />
-          <span className="close-instruction">Click anywhere to close</span>
-        </div>
-      )}
     </div>
   )
 }
