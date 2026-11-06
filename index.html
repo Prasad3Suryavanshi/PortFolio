@@ -1,19 +1,669 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>prasad suryavanshi — portfolio</title>
-    <meta name="description" content="Prasad Suryavanshi — Computer Science & Cybersecurity, JNTUH. Full-stack projects, security CTFs, and open source." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prasad Suryavanshi</title>
+<meta name="description" content="Prasad Suryavanshi, aspiring cybersecurity analyst based in Hyderabad, India.">
+<style>
+  :root {
+    --page: #eeebe6;
+    --ink: #22252a;
+    --comment: #2f5a63;
+    --keyword: #7a3d22;
+    --link: #1e4a8a;
+    --arrow: #2f7a80;
+    --border-soft: #b8b4ac;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    padding: clamp(1rem, 4vw, 2rem) clamp(0.75rem, 3vw, 1.5rem) clamp(2rem, 6vw, 3rem);
+    background: var(--page);
+    color: var(--ink);
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: clamp(15px, 1.1vw + 12px, 16px);
+    line-height: 1.6;
+    overflow-wrap: break-word;
+  }
+
+  main { max-width: min(120ch, 92vw); margin: 0 auto; }
+
+  a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+  a:hover { color: var(--ink); }
+  a:focus-visible, input:focus-visible, textarea:focus-visible, button:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 2px;
+  }
+
+  .intro { text-align: center; }
+  .intro h1 {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .intro p { margin: 0.5rem 0 0; }
+  .muted { color: #4d5350; }
+
+  .links { margin: clamp(1.25rem, 4vw, 2rem) 0 0; padding: 0; list-style: none; }
+  .links li { margin: 0.35rem 0; }
+  .links b { display: inline-block; min-width: 11ch; }
+
+  .module { margin-top: clamp(1.75rem, 5vw, 2.75rem); }
+  .module h2 {
+    margin: 0 0 0.6rem 0.25rem;
+    font-size: clamp(1.25rem, 3.5vw, 1.6rem);
+    line-height: 1.2;
+    color: var(--c);
+    font-weight: 700;
+  }
+  .module h2 .arrow { color: var(--arrow); text-decoration: none; font-weight: normal; }
+
+  .box {
+    border: clamp(5px, 1.2vw, 8px) solid var(--c);
+    border-top-width: clamp(16px, 3.5vw, 24px);
+    background: var(--f);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border-radius: 4px;
+  }
+
+  .grey  { --c: #6f7068; --f: #dcdad4; }
+  .red   { --c: #9c4a42; --f: #ead4cf; }
+  .green { --c: #4f6f42; --f: #d3e0c7; }
+  .teal  { --c: #2f6f66; --f: #c9dfd8; }
+  .blue  { --c: #3a5f85; --f: #cfdae7; }
+  .gold  { --c: #866a2e; --f: #e5d8b8; }
+
+  h3 { margin: 1.25rem 0 0; font-size: clamp(0.95rem, 1.2vw, 1rem); font-weight: 700; }
+  h3:first-child { margin-top: 0; }
+  p { margin: 0.4rem 0 0; }
+  ul { margin: 0.4rem 0 0; padding-left: 1.25rem; }
+  li { margin: 0.2rem 0; }
+
+  .cm { color: var(--comment); font-style: italic; }
+  .kw { color: var(--keyword); font-weight: 600; }
+
+  dl { margin: 0; display: grid; grid-template-columns: 13ch 1fr; gap: 0.3rem 1rem; }
+  dt { color: var(--comment); font-style: italic; font-weight: 600; }
+  dd { margin: 0; }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.75rem;
+    align-items: start;
+  }
+
+  .contact-list {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.55rem 1.25rem;
+    align-items: baseline;
+  }
+  .contact-list dt {
+    color: var(--comment);
+    font-style: italic;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .contact-list dd { margin: 0; }
+
+  .qr-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1.5px solid var(--border-soft);
+    background: #fff;
+    padding: 0.65rem 0.75rem 0.5rem;
+    border-radius: 6px;
+    margin: 0;
+  }
+  .qr-card canvas {
+    display: block;
+    width: 140px;
+    height: 140px;
+    image-rendering: pixelated;
+  }
+  .qr-card figcaption {
+    font-size: 0.7rem;
+    text-align: center;
+    line-height: 1.3;
+    color: var(--comment);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .contact-divider {
+    border: 0;
+    border-top: 1.5px dashed var(--border-soft);
+    margin: 1.5rem 0 0.25rem;
+  }
+
+  form { margin-top: 0; }
+  .form-title {
+    margin: 1.25rem 0 0;
+    font-size: clamp(0.95rem, 1.2vw, 1rem);
+    font-weight: 700;
+    color: var(--comment);
+  }
+  label, legend { display: block; margin-top: 1rem; font-weight: 700; }
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+
+  .radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 0.4rem;
+  }
+  .radio-row label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: normal;
+    margin: 0;
+  }
+  .radio-row input[type="radio"] {
+    margin: 0;
+    flex: none;
+    accent-color: var(--link);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 1rem;
+  }
+
+  input[type="text"], input[type="email"], textarea {
+    width: 100%;
+    margin-top: 0.3rem;
+    padding: 0.55rem;
+    font: inherit;
+    font-weight: normal;
+    color: var(--ink);
+    background: #fdfcfa;
+    border: 1.5px solid var(--border-soft);
+    border-radius: 3px;
+  }
+  input:focus, textarea:focus {
+    border-color: var(--link);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(30,74,138,0.18);
+  }
+  textarea { resize: vertical; min-height: 6rem; }
+
+  button {
+    margin-top: 1.25rem;
+    padding: 0.65rem 1.25rem;
+    font: inherit;
+    font-weight: 700;
+    color: #fff;
+    background: var(--link);
+    border: 1.5px solid var(--link);
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 20rem;
+  }
+  button:hover { background: #173a6b; border-color: #173a6b; }
+
+    footer {
+    margin-top: clamp(2rem, 6vw, 3rem);
+    padding-top: 1rem;
+    border-top: 1.5px solid var(--border-soft);
+    text-align: center;
+    color: var(--comment);
+    font-weight: 600;
+    font-size: clamp(0.8rem, 1vw, 1rem);
+  }
+
+  .footer-tagline {
+    margin-bottom: 0.4rem;
+    font-style: italic;
+    letter-spacing: 0.03em;
+  }
+
+  @media (max-width: 720px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 560px) {
+    .contact-list { grid-template-columns: 1fr; gap: 0; }
+    .contact-list dd { margin-bottom: 0.5rem; }
+    .links b { min-width: 0; display: block; }
+    .module h2 .arrow { display: none; }
+    button { max-width: 100%; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .qr-card { justify-self: start; }
+    .radio-row { flex-direction: column; gap: 0.4rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <div class="intro">
+      <h1>Prasad Suryavanshi</h1>
+      <p>Cybersecurity student and full-stack developer. Hyderabad, India.</p>
+      <p class="muted">Threat analysis and data systems. Portfolio 2026.</p>
+    </div>
+  </header>
+
+  <ul class="links" aria-label="Sections">
+    <li><b>Profile:</b> <a href="#about">about</a>, <a href="#education">education</a>, <a href="#contact">contact</a></li>
+    <li><b>Work:</b> <a href="#projects">projects</a>, <a href="#experience">experience</a>, <a href="#skills">skills</a></li>
+    <li><b>Credentials:</b> <a href="#certifications">certifications</a>, <a href="#achievements">achievements</a></li>
+  </ul>
+
+  <section class="module grey" id="about">
+    <h2>module: about <a class="arrow" href="#about">→</a></h2>
+    <div class="box">
+      <p>Computer science undergraduate focused on threat analysis and data systems. I build tools across the stack — from CLI utilities and web frameworks to security-focused extensions — and learn by shipping.</p>
+      <p><strong>Goal:</strong> Build a career in Japan and contribute to both the Japanese and Indian tech ecosystems.</p>
+      <dl style="margin-top: 1.25rem;">
+        <dt>// Focus</dt><dd>Full-stack engineering, applied security</dd>
+        <dt>// Based</dt><dd>Hyderabad, India</dd>
+        <dt>// Languages</dt><dd>English (C1), Hindi, Marathi</dd>
+        <dt>// Status</dt><dd>B.Tech student, graduating May 2027</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="module red" id="projects">
+    <h2>module: projects <a class="arrow" href="#projects">→</a></h2>
+    <div class="box">
+      <h3>FocusCode <span class="cm">// 2026</span></h3>
+      <p>VS Code extension that dims code outside the active block, so the function, loop, or class you're editing stands out. Language-aware detection via folding ranges, with multi-cursor and fixed-line modes.</p>
+      <p class="kw">TypeScript, VS Code API, Node.js</p>
+
+      <h3>chotu <span class="cm">// 2026</span></h3>
+      <p>URL shortener with redirect logic and TTL-based link expiry. Built on serverless Redis for automatic scaling.</p>
+      <p class="kw">JavaScript, Vercel, Upstash Redis</p>
+
+      <h3>newsposter &amp; otter <span class="cm">// 2026</span></h3>
+      <p>Two utility-first CSS/HTML5 frameworks (v2.0.0), SOLID-aligned and published to npm and jsDelivr.</p>
+      <p class="kw">CSS, HTML5, npm, jsDelivr</p>
+
+      <h3>saucypass <span class="cm">// 2025</span></h3>
+      <p>Open-source Python library for pronounceable, cryptographically secure passwords.</p>
+      <p class="kw">Python, Pip, Cryptography</p>
+
+      <h3>ftp secure transfer <span class="cm">// 2025</span></h3>
+      <p>Secure CLI for local-network file transfer over custom protocols. Led a team of three.</p>
+      <p class="kw">Python, CLI, Networking</p>
+
+      <h3>terminal clock <span class="cm">// 2025</span></h3>
+      <p>Customizable terminal clock CLI, published to PyPI.</p>
+      <p class="kw">Python, Bash, PyPI</p>
+    </div>
+  </section>
+
+  <section class="module green" id="experience">
+    <h2>module: experience <a class="arrow" href="#experience">→</a></h2>
+    <div class="box">
+      <h3>Data Analysis Intern, Vodafone Idea</h3>
+      <p class="cm">// Sep – Oct 2025. Remote, India.</p>
+      <ul>
+        <li>Built SQL and Python tools to validate and explore data, streamlining recurring reporting.</li>
+        <li>Prototyped SQL queries with AI-assisted tooling, cutting analysis turnaround time.</li>
+      </ul>
+
+      <h3>Security Analyst Job Simulation, Deloitte Australia (Forage)</h3>
+      <p class="cm">// Feb 2025. Virtual.</p>
+      <ul>
+        <li>Analyzed incident logs and drafted response plans.</li>
+        <li>Documented vulnerabilities in structured reports for stakeholders.</li>
+        <li>Ran simulated web security audits and network analysis.</li>
+      </ul>
+
+      <h3>Data Analysis Job Simulation, JPMorgan Chase</h3>
+      <p class="cm">// Jun 2024. Virtual.</p>
+      <ul>
+        <li>Built financial dashboards and automated recurring reports.</li>
+      </ul>
+
+      <h3>Excel Skills Job Simulation, Forage</h3>
+      <p class="cm">// Jun 2024. Remote.</p>
+      <ul>
+        <li>Used MS Excel for data analysis and planning.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="module teal" id="skills">
+    <h2>module: skills <a class="arrow" href="#skills">→</a></h2>
+    <div class="box">
+      <dl>
+        <dt>// Frontend</dt><dd>JavaScript, HTML5, CSS</dd>
+        <dt>// Languages</dt><dd>Python, C++, C, SQL, Bash</dd>
+        <dt>// Security</dt><dd>Web security, networking, secure coding</dd>
+        <dt>// Tools</dt><dd>Git/GitHub, Vercel CI/CD, npm, pip, Linux</dd>
+        <dt>// AI</dt><dd>LLM code refactoring, AI-driven analysis, agentic SDD</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="module blue" id="certifications">
+    <h2>module: certifications <a class="arrow" href="#certifications">→</a></h2>
+    <div class="box">
+      <ul>
+        <li>Fortinet NSE 1 Certified</li>
+        <li>Fortinet NSE 2 Certified</li>
+        <li>Fundamentals of Business Analysis</li>
+        <li>Intro to Data Science (Cisco)</li>
+        <li>Python for Data Science (NPTEL)</li>
+        <li>Cyber Job Simulation (Deloitte)</li>
+        <li>Excel Skills (JPMorgan)</li>
+        <li>English C1 (Cambridge)</li>
+        <li>Full Stack Web (MRCET)</li>
+        <li>Generative AI (IIT Hyderabad)</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="module gold" id="achievements">
+    <h2>module: achievements <a class="arrow" href="#achievements">→</a></h2>
+    <div class="box">
+      <h3>jailCTF 2026 <span class="kw">#62 globally</span></h3>
+      <p>Solved AI-assisted challenges in reverse engineering, OSINT, and payload construction.</p>
+
+      <h3>NDIAS Automotive/IoT CTF <span class="kw">#162</span></h3>
+      <p>Embedded and networked systems security.</p>
+
+      <h3>picoCTF 2026, Team Solus Data <span class="kw">#941 globally</span></h3>
+      <p>Independent problem-solving under time pressure.</p>
+
+      <h3>GDG / IIT Hyderabad AI Workshop</h3>
+      <p>Completed intensive AI training and joined CTF collaboration workshops. Contributor to the kana-dojo open-source repository.</p>
+    </div>
+  </section>
+
+  <section class="module grey" id="education">
+    <h2>module: education <a class="arrow" href="#education">→</a></h2>
+    <div class="box">
+      <h3>JNTUH / Malla Reddy College of Engineering &amp; Technology</h3>
+      <p class="cm">// 2023 – May 2027. Hyderabad, India.</p>
+      <p>B.Tech Computer Science, Cybersecurity specialization. <span class="kw">8.58 CGPA</span></p>
+
+      <h3>Army Public School RK Puram</h3>
+      <p class="cm">// March 2023. Secunderabad, India.</p>
+      <p>Class XII. <span class="kw">93% / 9.3 GPA</span></p>
+    </div>
+  </section>
+
+  <section class="module red" id="contact">
+    <h2>module: contact <a class="arrow" href="#contact">→</a></h2>
+    <div class="box">
+      <div class="contact-grid">
+        <dl class="contact-list">
+          <dt>// Email</dt>
+          <dd>prasadsuryavanshi [dot] 110306 [at] gmail [dot] com</dd>
+          <dt>// GitHub</dt>
+          <dd><a href="https://github.com/Prasad3Suryavanshi" target="_blank" rel="noreferrer">github.com/Prasad3Suryavanshi</a></dd>
+          <dt>// LinkedIn</dt>
+          <dd><a href="https://in.linkedin.com/in/prasad-suryavanshi" target="_blank" rel="noreferrer">linkedin.com/in/prasad-suryavanshi</a></dd>
+        </dl>
+
+        <figure class="qr-card">
+          <canvas id="qrCanvas" width="140" height="140" aria-label="QR code linking to contact card"></canvas>
+          <figcaption>scan → vCard</figcaption>
+        </figure>
+      </div>
+
+      <hr class="contact-divider">
+
+      <p class="form-title">// send a message</p>
+
+      <form action="https://getform.io/f/adrgpdoa" method="POST">
+        <div class="form-row">
+          <label for="name">Your name
+            <input type="text" id="name" name="name" placeholder="e.g. John Doe" required>
+          </label>
+
+          <label for="email">Your email
+            <input type="email" id="email" name="email" placeholder="hello@example.com" required>
+          </label>
+        </div>
+
+        <fieldset>
+          <legend>I'm interested in</legend>
+          <div class="radio-row">
+            <label><input type="radio" name="inquiry_type" value="hiring" required>Hiring / Job opportunity</label>
+            <label><input type="radio" name="inquiry_type" value="collab">Collaborating on a project</label>
+            <label><input type="radio" name="inquiry_type" value="general">Just saying hi / Simple contact</label>
+          </div>
+        </fieldset>
+
+        <label for="message">Your message
+          <textarea id="message" name="message" rows="5" placeholder="How can we work together?" required></textarea>
+        </label>
+
+        <button type="submit">Send message</button>
+      </form>
+    </div>
+  </section>
+
+    <footer>
+        <div class="footer-tagline">F*ck Style — Go Minimal</div>
+        <div class="footer-copy">&copy; 2026 Prasad Suryavanshi</div>
+    </footer>
+
+</main>
+
+<!-- QR encoder (version 1-5, byte mode, ECC L) -->
+<script>
+(function () {
+  "use strict";
+  var EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+  (function () {
+    var x = 1;
+    for (var i = 0; i < 255; i++) {
+      EXP[i] = x; LOG[x] = i; x <<= 1;
+      if (x & 0x100) x ^= 0x11d;
+    }
+    for (var i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+  })();
+  function gfMul(a, b) { if (a === 0 || b === 0) return 0; return EXP[LOG[a] + LOG[b]]; }
+  function rsGenPoly(degree) {
+    var poly = [1];
+    for (var i = 0; i < degree; i++) {
+      var next = new Array(poly.length + 1).fill(0);
+      for (var j = 0; j < poly.length; j++) {
+        next[j] ^= poly[j];
+        next[j + 1] ^= gfMul(poly[j], EXP[i]);
+      }
+      poly = next;
+    }
+    return poly;
+  }
+  function rsRemainder(data, degree) {
+    var gen = rsGenPoly(degree);
+    var result = new Array(degree).fill(0);
+    for (var i = 0; i < data.length; i++) {
+      var factor = data[i] ^ result[0];
+      result.shift(); result.push(0);
+      for (var j = 0; j < degree; j++) result[j] ^= gfMul(gen[j + 1], factor);
+    }
+    return result;
+  }
+  var VERSIONS_L = {
+    1: [26, 7, 1, 19, 0, 0], 2: [44, 10, 1, 34, 0, 0], 3: [70, 15, 1, 55, 0, 0],
+    4: [100, 20, 1, 80, 0, 0], 5: [134, 26, 1, 108, 0, 0]
+  };
+  function utf8Bytes(str) {
+    var out = [];
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charCodeAt(i);
+      if (c < 0x80) out.push(c);
+      else if (c < 0x800) out.push(0xc0 | (c >> 6), 0x80 | (c & 63));
+      else if (c < 0x10000) out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      else out.push(0xf0 | (c >> 18), 0x80 | ((c >> 12) & 63), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+    }
+    return out;
+  }
+  function chooseVersion(dataLen) {
+    for (var v = 1; v <= 5; v++) {
+      var meta = VERSIONS_L[v];
+      var dataCodewords = meta[2] * meta[3] + meta[4] * meta[5];
+      var neededBits = 4 + 8 + dataLen * 8;
+      if (neededBits <= dataCodewords * 8) return v;
+    }
+    throw new Error("data too long");
+  }
+  function encodeData(text, version) {
+    var bytes = utf8Bytes(text);
+    var meta = VERSIONS_L[version];
+    var dataCodewords = meta[2] * meta[3] + meta[4] * meta[5];
+    var bits = [];
+    function put(val, len) { for (var i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); }
+    put(0x4, 4); put(bytes.length, 8);
+    for (var i = 0; i < bytes.length; i++) put(bytes[i], 8);
+    var cap = dataCodewords * 8;
+    var term = Math.min(4, cap - bits.length);
+    put(0, term);
+    while (bits.length % 8 !== 0) bits.push(0);
+    var padBytes = [0xEC, 0x11], pi = 0;
+    while (bits.length < cap) { put(padBytes[pi % 2], 8); pi++; }
+    var data = [];
+    for (var i = 0; i < bits.length; i += 8) {
+      var v = 0;
+      for (var j = 0; j < 8; j++) v = (v << 1) | bits[i + j];
+      data.push(v);
+    }
+    return data;
+  }
+  function interleave(data, version) {
+    var meta = VERSIONS_L[version];
+    var ecPerBlock = meta[1];
+    var dataPerBlock1 = meta[3], dataPerBlock2 = meta[5];
+    var blocks = [], offset = 0;
+    for (var i = 0; i < meta[2]; i++) { blocks.push(data.slice(offset, offset + dataPerBlock1)); offset += dataPerBlock1; }
+    for (var i = 0; i < meta[4]; i++) { blocks.push(data.slice(offset, offset + dataPerBlock2)); offset += dataPerBlock2; }
+    var eccBlocks = blocks.map(function (b) { return rsRemainder(b, ecPerBlock); });
+    var result = [];
+    var maxData = Math.max(dataPerBlock1, dataPerBlock2);
+    for (var i = 0; i < maxData; i++) {
+      for (var b = 0; b < blocks.length; b++) {
+        if (i < blocks[b].length) result.push(blocks[b][i]);
+      }
+    }
+    for (var i = 0; i < ecPerBlock; i++) {
+      for (var b = 0; b < eccBlocks.length; b++) result.push(eccBlocks[b][i]);
+    }
+    return result;
+  }
+  function buildMatrix(codewords, version) {
+    var size = 17 + version * 4;
+    var m = [], reserved = [];
+    for (var y = 0; y < size; y++) {
+      m.push(new Array(size).fill(0));
+      reserved.push(new Array(size).fill(false));
+    }
+    function set(x, y, dark) { m[y][x] = dark ? 1 : 0; reserved[y][x] = true; }
+    function finder(cx, cy) {
+      for (var dy = -4; dy <= 4; dy++) {
+        for (var dx = -4; dx <= 4; dx++) {
+          var x = cx + dx, y = cy + dy;
+          if (x < 0 || x >= size || y < 0 || y >= size) continue;
+          var dist = Math.max(Math.abs(dx), Math.abs(dy));
+          set(x, y, dist !== 2 && dist !== 4);
+        }
+      }
+    }
+    finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+    for (var i = 8; i < size - 8; i++) {
+      set(i, 6, i % 2 === 0); set(6, i, i % 2 === 0);
+    }
+    if (version >= 2) {
+      var alignPos = { 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30] }[version];
+      for (var ai = 0; ai < alignPos.length; ai++) {
+        for (var aj = 0; aj < alignPos.length; aj++) {
+          var ax = alignPos[ai], ay = alignPos[aj];
+          if ((ax === 6 && ay === 6) || (ax === 6 && ay === size - 7) || (ax === size - 7 && ay === 6)) continue;
+          for (var dy = -2; dy <= 2; dy++) {
+            for (var dx = -2; dx <= 2; dx++) {
+              var dist = Math.max(Math.abs(dx), Math.abs(dy));
+              set(ax + dx, ay + dy, dist !== 1);
+            }
+          }
+        }
+      }
+    }
+    set(8, size - 8, 1);
+    for (var i = 0; i <= 8; i++) {
+      if (!reserved[8][i]) reserved[8][i] = true;
+      if (!reserved[i][8]) reserved[i][8] = true;
+    }
+    for (var i = size - 8; i < size; i++) if (!reserved[8][i]) reserved[8][i] = true;
+    for (var i = size - 7; i < size; i++) if (!reserved[i][8]) reserved[i][8] = true;
+    var bitIdx = 0, up = true;
+    for (var col = size - 1; col > 0; col -= 2) {
+      if (col === 6) col--;
+      for (var v = 0; v < size; v++) {
+        var row = up ? size - 1 - v : v;
+        for (var c = 0; c < 2; c++) {
+          var x = col - c;
+          if (reserved[row][x]) continue;
+          var bit = 0;
+          if (bitIdx < codewords.length * 8) {
+            bit = (codewords[bitIdx >> 3] >> (7 - (bitIdx & 7))) & 1;
+            bitIdx++;
+          }
+          if ((x + row) % 2 === 0) bit ^= 1;
+          m[row][x] = bit;
+        }
+      }
+      up = !up;
+    }
+    var formatData = (0x01 << 3) | 0, formatPoly = 0x537;
+    var fmt = formatData << 10;
+    for (var i = 14; i >= 10; i--) if ((fmt >> i) & 1) fmt ^= formatPoly << (i - 10);
+    fmt = ((formatData << 10) | fmt) ^ 0x5412;
+    var fbits = [];
+    for (var i = 14; i >= 0; i--) fbits.push((fmt >> i) & 1);
+    for (var i = 0; i <= 5; i++) m[8][i] = fbits[i];
+    m[8][7] = fbits[6]; m[8][8] = fbits[7]; m[7][8] = fbits[8];
+    for (var i = 9; i <= 14; i++) m[14 - i][8] = fbits[i];
+    for (var i = 0; i < 8; i++) m[size - 1 - i][8] = fbits[i];
+    for (var i = 8; i < 15; i++) m[8][size - 15 + i] = fbits[i];
+    return m;
+  }
+  function render(canvas, matrix) {
+    var size = matrix.length, cssW = 140;
+    var px = Math.max(1, Math.round(cssW / size));
+    canvas.width = size * px; canvas.height = size * px;
+    canvas.style.width = cssW + "px"; canvas.style.height = cssW + "px";
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#22252a";
+    for (var y = 0; y < size; y++) {
+      for (var x = 0; x < size; x++) {
+        if (matrix[y][x]) ctx.fillRect(x * px, y * px, px, px);
+      }
+    }
+  }
+  function generate(text, canvas) {
+    var bytes = utf8Bytes(text);
+    var version = chooseVersion(bytes.length);
+    var data = encodeData(text, version);
+    var codewords = interleave(data, version);
+    render(canvas, buildMatrix(codewords, version));
+  }
+  function init() {
+    var canvas = document.getElementById("qrCanvas");
+    if (!canvas || !canvas.getContext) return;
+    try { generate("https://prasad3suryavanshi.github.io/ContactCard/", canvas); } catch (e) {}
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>
+</body>
 </html>
