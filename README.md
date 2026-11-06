@@ -1,1 +1,1 @@
-file made
+# F\*ck Style — Go Minimal
